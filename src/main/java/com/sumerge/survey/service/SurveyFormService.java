@@ -27,12 +27,33 @@ public class SurveyFormService {
         if (existingForm.isPresent()) {
             updateSectionState(existingForm.get(), section, state);
         } else {
-            createNewForm(userId, section, state);
+            createForm(userId, section, state);
         }
+    }
+    private void createForm(String userId, String section, SectionState state) {
+        SurveyForm newForm = new SurveyForm();
+        newForm.setUserId(userId);
+
+        switch (section) {
+            case "environmental":
+                newForm.setEnvironmentalSection(state);
+                break;
+            case "social":
+                newForm.setSocialSection(state);
+                break;
+            case "governmental":
+                newForm.setGovernmentalSection(state);
+                break;
+        }
+
+        newForm.setLastUpdateTimestamp(LocalDateTime.now());
+
+        surveyFormRepository.save(newForm);
     }
 
     private void updateSectionState(SurveyForm form, String section, SectionState state) {
-        switch (section) {
+
+            switch (section) {
             case "environmental":
                 form.setEnvironmentalSection(state);
                 break;
@@ -52,7 +73,6 @@ public class SurveyFormService {
         SurveyForm newForm = new SurveyForm();
         newForm.setUserId(userId);
 
-        // Set the section states based on the provided map
         sectionStates.forEach((section, state) -> {
             switch (section) {
                 case "environmental":
