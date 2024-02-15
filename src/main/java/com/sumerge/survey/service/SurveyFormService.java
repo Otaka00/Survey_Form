@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -47,23 +48,27 @@ public class SurveyFormService {
         surveyFormRepository.save(form);
     }
 
-    private void createNewForm(String userId, String section, SectionState state) {
+    public void createNewForm(String userId, Map<String, SectionState> sectionStates) {
         SurveyForm newForm = new SurveyForm();
         newForm.setUserId(userId);
 
-        switch (section) {
-            case "environmental":
-                newForm.setEnvironmentalSection(state);
-                break;
-            case "social":
-                newForm.setSocialSection(state);
-                break;
-            case "governmental":
-                newForm.setGovernmentalSection(state);
-                break;
-        }
+        // Set the section states based on the provided map
+        sectionStates.forEach((section, state) -> {
+            switch (section) {
+                case "environmental":
+                    newForm.setEnvironmentalSection(state);
+                    break;
+                case "social":
+                    newForm.setSocialSection(state);
+                    break;
+                case "governmental":
+                    newForm.setGovernmentalSection(state);
+                    break;
+            }
+        });
 
         newForm.setLastUpdateTimestamp(LocalDateTime.now());
         surveyFormRepository.save(newForm);
     }
+
 }
