@@ -11,5 +11,4 @@ import java.util.Map;
 public class SectionStateRequest {
     private String userId;
     private Map<String, SectionState> sectionStates;
-
 }

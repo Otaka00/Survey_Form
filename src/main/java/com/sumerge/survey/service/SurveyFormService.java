@@ -47,7 +47,6 @@ public class SurveyFormService {
         if (existingFormOptional.isPresent()) {
             SurveyForm existingForm = existingFormOptional.get();
 
-            // Update section states based on the provided map
             sectionStates.forEach((section, state) -> {
                 setSectionState(existingForm, section, state);
             });
