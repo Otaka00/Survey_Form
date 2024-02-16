@@ -11,5 +11,4 @@ import java.util.Map;
 public class UpdateFormRequest {
     private long formId;
     private Map<String, SectionState> sectionStates;
-
 }

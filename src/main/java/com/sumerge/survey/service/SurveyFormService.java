@@ -3,11 +3,14 @@ package com.sumerge.survey.service;
 // SurveyFormService.java
 import com.sumerge.survey.enumeration.SectionState;
 import com.sumerge.survey.entity.SurveyForm;
+import com.sumerge.survey.exception.FormNotFoundException;
+import com.sumerge.survey.mapper.SurveyFormMapper;
 import com.sumerge.survey.repository.SurveyFormRepository;
 import com.sumerge.survey.response.FormDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +20,9 @@ public class SurveyFormService {
 
     @Autowired
     private SurveyFormRepository surveyFormRepository;
+
+    @Autowired
+    private SurveyFormMapper surveyFormMapper;
 
 
     public void createNewForm( Map<String, SectionState> sectionStates) {
@@ -29,7 +35,8 @@ public class SurveyFormService {
 
             newForm.setLastSubmitTimestamp(LocalDateTime.now());
             surveyFormRepository.save(newForm);
-        }catch (Exception ex){
+        }
+        catch (Exception ex){
             System.out.println(ex.getMessage());
         }
     }
@@ -47,6 +54,10 @@ public class SurveyFormService {
             existingForm.setLastSubmitTimestamp(LocalDateTime.now());
             surveyFormRepository.save(existingForm);
         }
+        else {
+            throw new FormNotFoundException("Form not found with ID: " + formId);
+        }
+
     }
 
     private void setSectionState(SurveyForm form, String section, SectionState state) {
@@ -77,20 +88,18 @@ public class SurveyFormService {
         return null;
     }
 
-    public FormDetailsResponse getFormDetails(long formId){
-        Optional<SurveyForm> formOptional = surveyFormRepository.findById(formId);
-        if(formOptional.isPresent()){
-            FormDetailsResponse detailsResponse = new FormDetailsResponse();
-            detailsResponse.setId(formOptional.get().getId());
-            detailsResponse.setDateAndTime(formOptional.get().getLastSubmitTimestamp());
-            detailsResponse.setSocial_status(formOptional.get().getSocialSection());
-            detailsResponse.setGovernmental_status(formOptional.get().getGovernmentalSection());
-            detailsResponse.setEnvironmental_status(formOptional.get().getEnvironmentalSection());
-            detailsResponse.setCompleted(this.formSubmitted(formOptional.get()));
-
-            return detailsResponse;
-        }
-        return null;
-
+    public FormDetailsResponse getFormDetails(long formId) {
+        return surveyFormRepository.findById(formId)
+                .map(form -> {
+                    FormDetailsResponse detailsResponse = new FormDetailsResponse();
+                    detailsResponse.setId(form.getId());
+                    detailsResponse.setDateAndTime(form.getLastSubmitTimestamp());
+                    detailsResponse.setSocial_status(form.getSocialSection());
+                    detailsResponse.setGovernmental_status(form.getGovernmentalSection());
+                    detailsResponse.setEnvironmental_status(form.getEnvironmentalSection());
+                    detailsResponse.setCompleted(this.formSubmitted(form));
+                    return detailsResponse;
+                })
+                .orElse(null);
     }
 }
