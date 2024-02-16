@@ -7,7 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SurveyFormRepository extends JpaRepository<SurveyForm, Long> {
-    Optional<SurveyForm> findByFormId(long formId);
-    List<SurveyForm> findAllByUserId(String userId);
 
 }

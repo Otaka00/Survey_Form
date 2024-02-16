@@ -2,34 +2,41 @@ package com.sumerge.survey.entity;
 
 // SurveyForm.java
 import com.sumerge.survey.enumeration.SectionState;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SurveyForm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String userId;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private SectionState environmentalSection;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private SectionState socialSection;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private SectionState governmentalSection;
 
     private LocalDateTime lastSubmitTimestamp;
+
+    @PrePersist
+    public void prePersist() {
+        if (environmentalSection == null) {
+            environmentalSection = SectionState.OPENED_UNTOUCHED;
+        }
+        if (socialSection == null) {
+            socialSection = SectionState.UNOPENED;
+        }
+        if (governmentalSection == null) {
+            governmentalSection = SectionState.UNOPENED;
+        }
+    }
 }

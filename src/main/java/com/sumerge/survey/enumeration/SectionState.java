@@ -2,10 +2,10 @@ package com.sumerge.survey.enumeration;
 
 // SectionState.java
 public enum SectionState {
-    UNOPENED(-1),
-    OPENED_UNTOUCHED(0),
-    OPENED_TOUCHED(1),
-    COMPLETED(2);
+    UNOPENED(0),
+    OPENED_UNTOUCHED(1),
+    OPENED_TOUCHED(2),
+    COMPLETED(3);
 
     private final int value;
 
