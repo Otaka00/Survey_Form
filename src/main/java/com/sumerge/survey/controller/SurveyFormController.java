@@ -1,8 +1,10 @@
 package com.sumerge.survey.controller;
 
 // SurveyFormController.java
-import com.sumerge.survey.dto.SectionStateRequest;
+import com.sumerge.survey.request.CreateFormRequest;
+import com.sumerge.survey.request.SectionStateRequest;
 import com.sumerge.survey.entity.SurveyForm;
+import com.sumerge.survey.request.UpdateFormRequest;
 import com.sumerge.survey.service.SurveyFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +29,20 @@ public class SurveyFormController {
         return ResponseEntity.ok("Section state recorded successfully.");
     }
     @PostMapping("/create-form")
-    public ResponseEntity<String> createForm(@RequestBody SectionStateRequest stateRequest) {
+    public ResponseEntity<String> createForm(@RequestBody CreateFormRequest createFormRequest) {
         surveyFormService.createNewForm(
-                stateRequest.getUserId(),
-                stateRequest.getSectionStates()
+                createFormRequest.getUserId(),
+                createFormRequest.getSectionStates()
         );
         return ResponseEntity.ok("Form created successfully.");
+    }
+
+    @PutMapping("/update-form")
+    public ResponseEntity<String> updateForm(@RequestBody UpdateFormRequest updateFormRequest) {
+        surveyFormService.updateForm(
+                updateFormRequest.getUserId(),
+                updateFormRequest.getSectionStates()
+        );
+        return ResponseEntity.ok("Form updated successfully.");
     }
 }

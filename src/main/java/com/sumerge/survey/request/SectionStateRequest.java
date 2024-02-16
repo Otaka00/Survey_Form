@@ -1,4 +1,4 @@
-package com.sumerge.survey.dto;
+package com.sumerge.survey.request;
 
 import com.sumerge.survey.enumeration.SectionState;
 import lombok.Getter;
