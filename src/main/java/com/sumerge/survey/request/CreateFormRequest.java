@@ -9,6 +9,6 @@ import java.util.Map;
 @Setter
 @Getter
 public class CreateFormRequest {
-    private String userId;
+    private long formId;
     private Map<String, SectionState> sectionStates;
 }

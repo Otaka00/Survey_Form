@@ -21,28 +21,28 @@ public class SurveyFormService {
         return surveyFormRepository.findAllByUserId(userId);
     }
 
-    public void recordSectionState(String userId, Map<String, SectionState> sectionStates) {
-        Optional<SurveyForm> existingFormOptional = surveyFormRepository.findByUserId(userId);
+    public void recordSectionState(long formId, Map<String, SectionState> sectionStates) {
+        Optional<SurveyForm> existingFormOptional = surveyFormRepository.findByFormId(formId);
 
         if (existingFormOptional.isPresent())
-            updateForm(String.valueOf(existingFormOptional.get()), sectionStates);
-         else createNewForm(userId, sectionStates);
+            updateForm(existingFormOptional.get().getId(), sectionStates);
+         else createNewForm(formId, sectionStates);
     }
 
-    public void createNewForm(String userId, Map<String, SectionState> sectionStates) {
+    public void createNewForm(long formId, Map<String, SectionState> sectionStates) {
         SurveyForm newForm = new SurveyForm();
-        newForm.setUserId(userId);
+        newForm.setId(formId);
 
         sectionStates.forEach((section, state) -> {
             setSectionState(newForm, section, state);
         });
 
-        newForm.setLastUpdateTimestamp(LocalDateTime.now());
+        newForm.setLastSubmitTimestamp(LocalDateTime.now());
         surveyFormRepository.save(newForm);
     }
 
-    public void updateForm(String userId, Map<String, SectionState> sectionStates) {
-        Optional<SurveyForm> existingFormOptional = surveyFormRepository.findByUserId(userId);
+    public void updateForm(long formId, Map<String, SectionState> sectionStates) {
+        Optional<SurveyForm> existingFormOptional = surveyFormRepository.findByFormId(formId);
 
         if (existingFormOptional.isPresent()) {
             SurveyForm existingForm = existingFormOptional.get();
@@ -51,7 +51,7 @@ public class SurveyFormService {
                 setSectionState(existingForm, section, state);
             });
 
-            existingForm.setLastUpdateTimestamp(LocalDateTime.now());
+            existingForm.setLastSubmitTimestamp(LocalDateTime.now());
             surveyFormRepository.save(existingForm);
         }
     }
@@ -68,5 +68,16 @@ public class SurveyFormService {
                 form.setGovernmentalSection(state);
                 break;
         }
+    }
+    private boolean formSubmitted(SurveyForm form) {
+        return form.getEnvironmentalSection() == SectionState.COMPLETED &&
+                form.getSocialSection() == SectionState.COMPLETED &&
+                form.getGovernmentalSection() == SectionState.COMPLETED;
+    }
+
+    public LocalDateTime getLastSubmitTimestamp(long formId) {
+        Optional<SurveyForm> formOptional = surveyFormRepository.findByFormId(formId);
+            SurveyForm form = formOptional.get();
+            return form.getLastSubmitTimestamp();
     }
 }

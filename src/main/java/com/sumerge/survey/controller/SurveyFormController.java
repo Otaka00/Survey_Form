@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -25,14 +26,14 @@ public class SurveyFormController {
 
     @PostMapping("/record-section-state")
     public ResponseEntity<String> recordSectionState(@RequestBody SectionStateRequest request) {
-        surveyFormService.recordSectionState(request.getUserId(), request.getSectionStates());
+        surveyFormService.recordSectionState(request.getFormId(), request.getSectionStates());
         return ResponseEntity.ok("Section state recorded successfully.");
     }
 
     @PostMapping("/create-form")
     public ResponseEntity<String> createForm(@RequestBody CreateFormRequest createFormRequest) {
         surveyFormService.createNewForm(
-                createFormRequest.getUserId(),
+                createFormRequest.getFormId(),
                 createFormRequest.getSectionStates()
         );
         return ResponseEntity.ok("Form created successfully.");
@@ -41,9 +42,14 @@ public class SurveyFormController {
     @PutMapping("/update-form")
     public ResponseEntity<String> updateForm(@RequestBody UpdateFormRequest updateFormRequest) {
         surveyFormService.updateForm(
-                updateFormRequest.getUserId(),
+                updateFormRequest.getFormId(),
                 updateFormRequest.getSectionStates()
         );
         return ResponseEntity.ok("Form updated successfully.");
+    }
+    @GetMapping("/last-submit-timestamp/{userId}")
+    public ResponseEntity<LocalDateTime> getLastSubmitTimestamp(@PathVariable long formId) {
+        LocalDateTime lastSubmitTimestamp = surveyFormService.getLastSubmitTimestamp(formId);
+        return ResponseEntity.ok(lastSubmitTimestamp);
     }
 }

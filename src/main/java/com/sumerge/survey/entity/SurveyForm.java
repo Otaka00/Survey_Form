@@ -31,5 +31,5 @@ public class SurveyForm {
     @Enumerated(EnumType.ORDINAL)
     private SectionState governmentalSection;
 
-    private LocalDateTime lastUpdateTimestamp;
+    private LocalDateTime lastSubmitTimestamp;
 }
