@@ -1,6 +1,5 @@
 package com.sumerge.survey.controller;
 
-// SurveyFormController.java
 import com.sumerge.survey.request.CreateFormRequest;
 import com.sumerge.survey.request.SectionStateRequest;
 import com.sumerge.survey.entity.SurveyForm;
