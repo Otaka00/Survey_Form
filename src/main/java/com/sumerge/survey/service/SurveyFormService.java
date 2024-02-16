@@ -21,59 +21,18 @@ public class SurveyFormService {
         return surveyFormRepository.findAllByUserId(userId);
     }
 
-    public void recordSectionState(String userId, String section, SectionState state) {
-        Optional<SurveyForm> existingForm = surveyFormRepository.findByUserId(userId);
+    public void recordSectionState(String userId, Map<String, SectionState> sectionStates) {
+        Optional<SurveyForm> existingFormOptional = surveyFormRepository.findByUserId(userId);
 
-        if (existingForm.isPresent()) {
-            updateSectionState(existingForm.get(), section, state);
-        } else {
-            createForm(userId, section, state);
-        }
-    }
-    private void createForm(String userId, String section, SectionState state) {
-        SurveyForm newForm = new SurveyForm();
-        newForm.setUserId(userId);
-
-        switch (section) {
-            case "environmental":
-                newForm.setEnvironmentalSection(state);
-                break;
-            case "social":
-                newForm.setSocialSection(state);
-                break;
-            case "governmental":
-                newForm.setGovernmentalSection(state);
-                break;
-        }
-
-        newForm.setLastUpdateTimestamp(LocalDateTime.now());
-
-        surveyFormRepository.save(newForm);
-    }
-
-    private void updateSectionState(SurveyForm form, String section, SectionState state) {
-
-            switch (section) {
-            case "environmental":
-                form.setEnvironmentalSection(state);
-                break;
-            case "social":
-                form.setSocialSection(state);
-                break;
-            case "governmental":
-                form.setGovernmentalSection(state);
-                break;
-        }
-
-        form.setLastUpdateTimestamp(LocalDateTime.now());
-        surveyFormRepository.save(form);
+        if (existingFormOptional.isPresent())
+            updateForm(String.valueOf(existingFormOptional.get()), sectionStates);
+         else createNewForm(userId, sectionStates);
     }
 
     public void createNewForm(String userId, Map<String, SectionState> sectionStates) {
         SurveyForm newForm = new SurveyForm();
         newForm.setUserId(userId);
 
-        // Set the section states based on the provided map
         sectionStates.forEach((section, state) -> {
             setSectionState(newForm, section, state);
         });
@@ -109,8 +68,6 @@ public class SurveyFormService {
             case "governmental":
                 form.setGovernmentalSection(state);
                 break;
-            // Add cases for other sections if needed
         }
     }
-
 }

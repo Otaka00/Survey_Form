@@ -10,8 +10,6 @@ import java.util.Map;
 @Getter
 public class SectionStateRequest {
     private String userId;
-    private String section;
-    private SectionState state;
     private Map<String, SectionState> sectionStates;
 
 }

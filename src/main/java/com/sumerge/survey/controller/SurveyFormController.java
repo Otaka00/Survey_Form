@@ -25,9 +25,10 @@ public class SurveyFormController {
 
     @PostMapping("/record-section-state")
     public ResponseEntity<String> recordSectionState(@RequestBody SectionStateRequest request) {
-        surveyFormService.recordSectionState(request.getUserId(), request.getSection(), request.getState());
+        surveyFormService.recordSectionState(request.getUserId(), request.getSectionStates());
         return ResponseEntity.ok("Section state recorded successfully.");
     }
+
     @PostMapping("/create-form")
     public ResponseEntity<String> createForm(@RequestBody CreateFormRequest createFormRequest) {
         surveyFormService.createNewForm(
