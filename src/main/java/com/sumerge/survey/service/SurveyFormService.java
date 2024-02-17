@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class SurveyFormService {
 
     @Autowired
@@ -27,10 +26,6 @@ public class SurveyFormService {
 
     @Autowired
     private SurveyFormMapper surveyFormMapper;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
 
     public void createNewForm( Map<String, SectionState> sectionStates) {
         try {
@@ -67,11 +62,6 @@ public class SurveyFormService {
         }
     }
 
-    @Transactional
-    private void update(SurveyForm surveyForm){
-        entityManager.merge(surveyForm);
-    }
-
     private void setSectionState(SurveyForm form, String section, SectionState state) {
         switch (section) {
             case "environmental":
@@ -86,33 +76,9 @@ public class SurveyFormService {
         }
     }
 
-    private boolean formSubmitted(SurveyForm form) {
-        return form.getEnvironmentalSection() == SectionState.COMPLETED &&
-                form.getSocialSection() == SectionState.COMPLETED &&
-                form.getGovernmentalSection() == SectionState.COMPLETED;
-    }
-
-    public LocalDateTime getLastSubmitTimestamp(long formId) {
-            Optional<SurveyForm> formOptional = surveyFormRepository.findById(formId);
-            if(formOptional.isPresent()) {
-                SurveyForm form = formOptional.get();
-                return form.getLastSubmitTimestamp();
-            }
-        return null;
-    }
-
     public FormDetailsResponseDTO getFormDetails(long formId) {
         return surveyFormRepository.findById(formId)
-                .map(form -> {
-                    FormDetailsResponseDTO detailsResponse = new FormDetailsResponseDTO();
-                    detailsResponse.setId(form.getId());
-                    detailsResponse.setDateAndTime(form.getLastSubmitTimestamp());
-                    detailsResponse.setSocial_status(form.getSocialSection());
-                    detailsResponse.setGovernmental_status(form.getGovernmentalSection());
-                    detailsResponse.setEnvironmental_status(form.getEnvironmentalSection());
-                    detailsResponse.setCompleted(this.formSubmitted(form));
-                    return detailsResponse;
-                })
+                .map(SurveyFormMapper::mapToDto)
                 .orElse(null);
     }
 }

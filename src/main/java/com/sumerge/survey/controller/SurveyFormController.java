@@ -22,18 +22,13 @@ public class SurveyFormController {
 
     @PostMapping("/create-form")
     public ResponseEntity<String> createForm(@RequestBody CreateFormRequestDTO createFormRequest) {
-        surveyFormService.createNewForm(
-                createFormRequest.getSectionStates()
-        );
+        surveyFormService.createNewForm(createFormRequest.getSectionStates());
         return ResponseEntity.ok("Form created successfully.");
     }
 
     @PutMapping("/update-form")
     public ResponseEntity<String> updateForm(@RequestBody UpdateFormRequestDTO updateFormRequest) {
-        surveyFormService.updateForm(
-                updateFormRequest.getFormId(),
-                updateFormRequest.getSectionStates()
-        );
+        surveyFormService.updateForm(updateFormRequest.getFormId(), updateFormRequest.getSectionStates());
         return ResponseEntity.ok("Form updated successfully.");
     }
 }
