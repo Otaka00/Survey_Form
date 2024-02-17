@@ -1,6 +1,5 @@
 package com.sumerge.survey.entity;
 
-// SurveyForm.java
 import com.sumerge.survey.enumeration.SectionState;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,6 +1,4 @@
 package com.sumerge.survey.enumeration;
-
-// SectionState.java
 public enum SectionState {
     UNOPENED(0),
     OPENED_UNTOUCHED(1),

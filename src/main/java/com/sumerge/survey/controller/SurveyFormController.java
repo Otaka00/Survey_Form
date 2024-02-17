@@ -1,18 +1,12 @@
 package com.sumerge.survey.controller;
 
-import com.sumerge.survey.mapper.SurveyFormMapper;
 import com.sumerge.survey.request.CreateFormRequest;
-import com.sumerge.survey.request.SectionStateRequest;
-import com.sumerge.survey.entity.SurveyForm;
 import com.sumerge.survey.request.UpdateFormRequest;
 import com.sumerge.survey.response.FormDetailsResponse;
 import com.sumerge.survey.service.SurveyFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/survey-form")
