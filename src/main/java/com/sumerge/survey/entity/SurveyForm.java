@@ -28,14 +28,16 @@ public class SurveyForm {
 
     @PrePersist
     public void prePersist() {
-        if (environmentalSection == null) {
+        if (environmentalSection == null)
             environmentalSection = SectionState.OPENED_UNTOUCHED;
-        }
-        if (socialSection == null) {
+
+        if (socialSection == null)
             socialSection = SectionState.UNOPENED;
-        }
-        if (governmentalSection == null) {
+
+        if (governmentalSection == null)
             governmentalSection = SectionState.UNOPENED;
-        }
+
+        if(governmentalSection != SectionState.UNOPENED)
+            socialSection = SectionState.OPENED_UNTOUCHED;
     }
 }

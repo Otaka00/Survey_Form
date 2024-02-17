@@ -1,4 +1,4 @@
-package com.sumerge.survey.request;
+package com.sumerge.survey.dto;
 
 import com.sumerge.survey.enumeration.SectionState;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SectionStateRequest {
+public class SectionStateRequestDTO {
     private long formId;
     private Map<String, SectionState> sectionStates;
 }

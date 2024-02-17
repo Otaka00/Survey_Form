@@ -1,8 +1,5 @@
 package com.sumerge.survey.mapper;
 
-import com.sumerge.survey.entity.SurveyForm;
-import com.sumerge.survey.enumeration.SectionState;
-import com.sumerge.survey.response.FormDetailsResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -5,7 +5,7 @@ import com.sumerge.survey.entity.SurveyForm;
 import com.sumerge.survey.exception.FormNotFoundException;
 import com.sumerge.survey.mapper.SurveyFormMapper;
 import com.sumerge.survey.repository.SurveyFormRepository;
-import com.sumerge.survey.response.FormDetailsResponse;
+import com.sumerge.survey.dto.FormDetailsResponseDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 //import jakarta.transaction.Transactional;
@@ -101,36 +101,18 @@ public class SurveyFormService {
         return null;
     }
 
-    public FormDetailsResponse getFormDetails(long formId){
-        Optional<SurveyForm> formOptional = surveyFormRepository.findById(formId);
-        if(formOptional.isPresent()){
-            FormDetailsResponse detailsResponse = new FormDetailsResponse();
-            detailsResponse.setId(formOptional.get().getId());
-            detailsResponse.setDateAndTime(formOptional.get().getLastSubmitTimestamp());
-            detailsResponse.setSocial_status(formOptional.get().getSocialSection());
-            detailsResponse.setGovernmental_status(formOptional.get().getGovernmentalSection());
-            detailsResponse.setEnvironmental_status(formOptional.get().getEnvironmentalSection());
-            detailsResponse.setCompleted(this.formSubmitted(formOptional.get()));
-
-            return detailsResponse;
-        }
-        return null;
-
+    public FormDetailsResponseDTO getFormDetails(long formId) {
+        return surveyFormRepository.findById(formId)
+                .map(form -> {
+                    FormDetailsResponseDTO detailsResponse = new FormDetailsResponseDTO();
+                    detailsResponse.setId(form.getId());
+                    detailsResponse.setDateAndTime(form.getLastSubmitTimestamp());
+                    detailsResponse.setSocial_status(form.getSocialSection());
+                    detailsResponse.setGovernmental_status(form.getGovernmentalSection());
+                    detailsResponse.setEnvironmental_status(form.getEnvironmentalSection());
+                    detailsResponse.setCompleted(this.formSubmitted(form));
+                    return detailsResponse;
+                })
+                .orElse(null);
     }
-
-
-//    public FormDetailsResponse getFormDetails(long formId) {
-//        return surveyFormRepository.findById(formId)
-//                .map(form -> {
-//                    FormDetailsResponse detailsResponse = new FormDetailsResponse();
-//                    detailsResponse.setId(form.getId());
-//                    detailsResponse.setDateAndTime(form.getLastSubmitTimestamp());
-//                    detailsResponse.setSocial_status(form.getSocialSection());
-//                    detailsResponse.setGovernmental_status(form.getGovernmentalSection());
-//                    detailsResponse.setEnvironmental_status(form.getEnvironmentalSection());
-//                    detailsResponse.setCompleted(this.formSubmitted(form));
-//                    return detailsResponse;
-//                })
-//                .orElse(null);
-//    }
 }
