@@ -85,6 +85,7 @@ public class SurveyFormService {
                 break;
         }
     }
+
     private boolean formSubmitted(SurveyForm form) {
         return form.getEnvironmentalSection() == SectionState.COMPLETED &&
                 form.getSocialSection() == SectionState.COMPLETED &&
@@ -100,18 +101,36 @@ public class SurveyFormService {
         return null;
     }
 
-    public FormDetailsResponse getFormDetails(long formId) {
-        return surveyFormRepository.findById(formId)
-                .map(form -> {
-                    FormDetailsResponse detailsResponse = new FormDetailsResponse();
-                    detailsResponse.setId(form.getId());
-                    detailsResponse.setDateAndTime(form.getLastSubmitTimestamp());
-                    detailsResponse.setSocial_status(form.getSocialSection());
-                    detailsResponse.setGovernmental_status(form.getGovernmentalSection());
-                    detailsResponse.setEnvironmental_status(form.getEnvironmentalSection());
-                    detailsResponse.setCompleted(this.formSubmitted(form));
-                    return detailsResponse;
-                })
-                .orElse(null);
+    public FormDetailsResponse getFormDetails(long formId){
+        Optional<SurveyForm> formOptional = surveyFormRepository.findById(formId);
+        if(formOptional.isPresent()){
+            FormDetailsResponse detailsResponse = new FormDetailsResponse();
+            detailsResponse.setId(formOptional.get().getId());
+            detailsResponse.setDateAndTime(formOptional.get().getLastSubmitTimestamp());
+            detailsResponse.setSocial_status(formOptional.get().getSocialSection());
+            detailsResponse.setGovernmental_status(formOptional.get().getGovernmentalSection());
+            detailsResponse.setEnvironmental_status(formOptional.get().getEnvironmentalSection());
+            detailsResponse.setCompleted(this.formSubmitted(formOptional.get()));
+
+            return detailsResponse;
+        }
+        return null;
+
     }
+
+
+//    public FormDetailsResponse getFormDetails(long formId) {
+//        return surveyFormRepository.findById(formId)
+//                .map(form -> {
+//                    FormDetailsResponse detailsResponse = new FormDetailsResponse();
+//                    detailsResponse.setId(form.getId());
+//                    detailsResponse.setDateAndTime(form.getLastSubmitTimestamp());
+//                    detailsResponse.setSocial_status(form.getSocialSection());
+//                    detailsResponse.setGovernmental_status(form.getGovernmentalSection());
+//                    detailsResponse.setEnvironmental_status(form.getEnvironmentalSection());
+//                    detailsResponse.setCompleted(this.formSubmitted(form));
+//                    return detailsResponse;
+//                })
+//                .orElse(null);
+//    }
 }

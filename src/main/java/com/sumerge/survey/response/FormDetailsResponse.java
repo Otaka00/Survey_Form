@@ -10,11 +10,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FormDetailsResponse {
 
-    private Long id;
-    private SectionState environmental_status;
-    private SectionState social_status;
-    private SectionState governmental_status;
+    private long Id;
     private LocalDateTime dateAndTime;
+    private SectionState environmental_status;
+    private SectionState governmental_status;
+    private SectionState social_status;
+
     private boolean completed;
 
 }
