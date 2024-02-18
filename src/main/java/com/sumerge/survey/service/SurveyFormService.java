@@ -1,68 +1,74 @@
 package com.sumerge.survey.service;
 
+import com.sumerge.survey.controller.SurveyFormController;
 import com.sumerge.survey.enumeration.SectionState;
-import com.sumerge.survey.entity.SurveyForm;
-import com.sumerge.survey.exception.FormNotFoundException;
-import com.sumerge.survey.mapper.SurveyFormMapper;
+import com.sumerge.survey.entity.SurveyAnalytic;
 import com.sumerge.survey.repository.SurveyFormRepository;
 import com.sumerge.survey.dto.FormDetailsResponseDTO;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-//import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-
+import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 @Service
 public class SurveyFormService {
 
+    Logger logger = LoggerFactory.getLogger(SurveyFormService.class);
+
     @Autowired
     private SurveyFormRepository surveyFormRepository;
 
-    @Autowired
-    private SurveyFormMapper surveyFormMapper;
+        public void configureStates(SurveyAnalytic surveyAnalytic) {
+        if (surveyAnalytic.getEnvironmentalSection() == null)
+            surveyAnalytic.setEnvironmentalSection(SectionState.OPENED_UNTOUCHED);
 
-    public void createNewForm( Map<String, SectionState> sectionStates) {
-        try {
-            SurveyForm newForm = new SurveyForm();
+        if (surveyAnalytic.getSocialSection() == null)
+            surveyAnalytic.setSocialSection(SectionState.UNOPENED);
+
+        if (surveyAnalytic.getGovernmentalSection() == null)
+            surveyAnalytic.setGovernmentalSection(SectionState.UNOPENED);
+
+        if(surveyAnalytic.getGovernmentalSection() != SectionState.UNOPENED)
+            surveyAnalytic.setSocialSection(SectionState.OPENED_UNTOUCHED);
+    }
+
+    public void createOrUpdate(Long companyId, Long duratingConfigId, Map<String, SectionState> sectionStates){
+        List<SurveyAnalytic> existingFormList = surveyFormRepository.findByCompanyIdAndDuratingConfigId(companyId, duratingConfigId);
+        logger.info("An INFO Message");
+
+        if (!existingFormList.isEmpty()){
+                SurveyAnalytic existingForm = existingFormList.get(0);
+
+                sectionStates.forEach((section, state) ->
+                        setSectionState(existingForm, section, state)
+                );
+
+                existingForm.setUpdateTimestamp(LocalDateTime.now());
+                surveyFormRepository.save(existingForm);
+            }
+
+        else{
+            SurveyAnalytic surveyAnalytic = new SurveyAnalytic();
             if (!sectionStates.isEmpty())
                 sectionStates.forEach((section, state) -> {
-                    setSectionState(newForm, section, state);
+                    setSectionState(surveyAnalytic, section, state);
                 });
 
-            newForm.setLastSubmitTimestamp(LocalDateTime.now());
-            surveyFormRepository.save(newForm);
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    public void updateForm(long formId, Map<String, SectionState> sectionStates) {
-        Optional<SurveyForm> existingFormOptional = surveyFormRepository.findById(formId);
-
-        if (existingFormOptional.isPresent()) {
-            SurveyForm existingForm = existingFormOptional.get();
-
-            sectionStates.forEach((section, state) ->
-                setSectionState(existingForm, section, state)
-            );
-
-            existingForm.setLastSubmitTimestamp(LocalDateTime.now());
-            surveyFormRepository.save(existingForm);
-            System.out.println("Form details: " + existingForm);
-        }
-        else {
-            throw new FormNotFoundException("Form not found with ID: " + formId);
+            configureStates(surveyAnalytic);
+            surveyAnalytic.setCreateTimestamp(LocalDateTime.now());
+            surveyAnalytic.setUpdateTimestamp(LocalDateTime.now());
+            surveyAnalytic.setCompanyId(companyId);
+            surveyAnalytic.setDuratingConfigId(duratingConfigId);
+            surveyFormRepository.save(surveyAnalytic);
         }
     }
 
-    private void setSectionState(SurveyForm form, String section, SectionState state) {
+    private void setSectionState(SurveyAnalytic form, String section, SectionState state) {
         switch (section) {
             case "environmental":
                 form.setEnvironmentalSection(state);
@@ -76,9 +82,29 @@ public class SurveyFormService {
         }
     }
 
-    public FormDetailsResponseDTO getFormDetails(long formId) {
-        return surveyFormRepository.findById(formId)
-                .map(SurveyFormMapper::mapToDto)
-                .orElse(null);
+    private boolean formSubmitted(SurveyAnalytic form) {
+        return form.getEnvironmentalSection() == SectionState.COMPLETED &&
+                form.getSocialSection() == SectionState.COMPLETED &&
+                form.getGovernmentalSection() == SectionState.COMPLETED;
     }
+    public FormDetailsResponseDTO getFormDetails(Long companyId, Long duratingConfigId){
+        List<SurveyAnalytic> existingFormList = surveyFormRepository.findByCompanyIdAndDuratingConfigId(companyId, duratingConfigId);
+        if(!existingFormList.isEmpty()){
+            FormDetailsResponseDTO detailsResponse = new FormDetailsResponseDTO();
+            detailsResponse.setId(existingFormList.get(0).getId());
+            detailsResponse.setCompanyId(existingFormList.get(0).getCompanyId());
+            detailsResponse.setDuratingConfigId(existingFormList.get(0).getDuratingConfigId());
+            detailsResponse.setCreateTimestamp(existingFormList.get(0).getCreateTimestamp());
+            detailsResponse.setUpdateTimestamp(existingFormList.get(0).getUpdateTimestamp());
+            detailsResponse.setSocial_status(existingFormList.get(0).getSocialSection());
+            detailsResponse.setGovernmental_status(existingFormList.get(0).getGovernmentalSection());
+            detailsResponse.setEnvironmental_status(existingFormList.get(0).getEnvironmentalSection());
+            detailsResponse.setCompleted(this.formSubmitted(existingFormList.get(0)));
+
+            return detailsResponse;
+        }
+        return null;
+
+    }
+
 }

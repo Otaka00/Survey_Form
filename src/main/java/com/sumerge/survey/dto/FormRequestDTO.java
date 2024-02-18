@@ -8,7 +8,8 @@ import java.util.Map;
 
 @Setter
 @Getter
-public class UpdateFormRequestDTO {
-    private long formId;
+public class FormRequestDTO {
+    Long companyId;
+    Long duratingConfigId;
     private Map<String, SectionState> sectionStates;
 }

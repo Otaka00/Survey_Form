@@ -10,10 +10,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SurveyForm {
+public class SurveyAnalytic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private Long companyId;
+
+    private Long duratingConfigId;
 
     @Enumerated(EnumType.STRING)
     private SectionState environmentalSection;
@@ -24,20 +28,9 @@ public class SurveyForm {
     @Enumerated(EnumType.STRING)
     private SectionState governmentalSection;
 
-    private LocalDateTime lastSubmitTimestamp;
+    private LocalDateTime createTimestamp;
 
-    @PrePersist
-    public void prePersist() {
-        if (environmentalSection == null)
-            environmentalSection = SectionState.OPENED_UNTOUCHED;
+    private LocalDateTime updateTimestamp;
 
-        if (socialSection == null)
-            socialSection = SectionState.UNOPENED;
 
-        if (governmentalSection == null)
-            governmentalSection = SectionState.UNOPENED;
-
-        if(governmentalSection != SectionState.UNOPENED)
-            socialSection = SectionState.OPENED_UNTOUCHED;
-    }
 }
